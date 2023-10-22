@@ -68,21 +68,21 @@ export default class WorldManager {
     return this.asteroids;
   }
 
-  public createMiner(
+  public createMiner(data:{
     planetId: string,
     minerId: string,
     carryCapacity: number,
     travelSpeed: number,
-    miningSpeed: number
+    miningSpeed: number}
   ) {
-    const planet = this.planets.find((item) => item.id === planetId);
+    const planet = this.planets.find((item) => item.id === data.planetId);
 
     if (!planet) {
       throw new Error('Planet not exist')
     }
     const existMiner = planet
       .getAllMiners()
-      .find((item) => item.id === minerId);
+      .find((item) => item.id === data.minerId);
     if (existMiner) {
       throw new Error('Miner name exist')
     }
@@ -90,10 +90,10 @@ export default class WorldManager {
     planet.spawnMiner(
       planet.x,
       planet.y,
-      minerId,
-      carryCapacity,
-      travelSpeed,
-      miningSpeed
+      data.minerId,
+      data.carryCapacity,
+      data.travelSpeed,
+      data.miningSpeed
     );
   }
 

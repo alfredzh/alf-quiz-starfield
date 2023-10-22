@@ -1,3 +1,4 @@
+import History from "./models/history";
 import { calculateNewCoordinates } from "./utils";
 import { myEmitter } from "./worldManager";
 
@@ -7,21 +8,6 @@ export enum MinerStatus {
   Mining,
   Transfering,
 }
-
-const CARRY_CAPACITY_RANGE = {
-  min: 1,
-  max: 200,
-};
-
-const TRAVEL_SPEED_RANGE = {
-  min: 1,
-  max: 200,
-};
-
-const MINING_SPEED_RANGE = {
-  min: 1,
-  max: 200,
-};
 
 export default class Miner {
   public readonly id: string;
@@ -124,7 +110,8 @@ export default class Miner {
       this.mineAmount = 0;
       this.status = MinerStatus.Idle;
     } else {
-      this.log(`Transfering minerals to planet ${this.planetId}`);
+      const log = `Transfering minerals to planet ${this.planetId}`;
+      this.log(log);
     }
 
     myEmitter.emit("minerUpdate", this);
@@ -138,9 +125,8 @@ export default class Miner {
       amound = capacityRemaining;
     }
 
-    this.log(
-      `Mining asteroid ${this.targetAsteroidId} for ${this.miningYear} years`
-    );
+    const log = `Mining asteroid ${this.targetAsteroidId} for ${this.miningYear} years`;
+    this.log(log);
 
     myEmitter.emit("mineAsteroid", {
       amound,
@@ -182,9 +168,8 @@ export default class Miner {
       this.isSearchingAsteroid = false;
       this.targetAsteroidId = asteroidId;
 
-      this.log(
-        `Traveling from planet ${this.planetName} to asteroid ${this.targetAsteroidId}`
-      );
+      const log = `Traveling from planet ${this.planetName} to asteroid ${this.targetAsteroidId}`;
+      this.log(log);
     });
 
     myEmitter.on("mineAsteroidSuccess", ({ minerId, amount, isDepleted }) => {
@@ -204,9 +189,8 @@ export default class Miner {
         this.targetX = undefined;
         this.targetY = undefined;
 
-        this.log(
-          `Traveling back from asteroid ${targetAsteroidId} to ${this.planetName}`
-        );
+        const log = `Traveling back from asteroid ${targetAsteroidId} to ${this.planetName}`;
+        this.log(log);
       }
 
       myEmitter.emit("minerUpdate", this);
@@ -214,12 +198,24 @@ export default class Miner {
   }
 
   private spawn() {
-    this.log(`Miner spawn on planet ${this.planetId}`);
+    const log = `Miner spawn on planet ${this.planetId}`;
+    this.log(log);
   }
 
   private log(message: string) {
-    console.log(message);
-    // TODO save message to database
+    const history = new History({
+      createdAt: new Date(),
+      planet: this.planetName,
+      carryCapacity: this.carryCapacity,
+      travelSpeed: this.travelSpeed,
+      miningSpeed: this.miningSpeed,
+      x: this.x,
+      y: this.y,
+      year: this.miningYear,
+      minerId: this.id,
+      status: message,
+    });
+    history.save();
   }
 
   fireRun() {}
