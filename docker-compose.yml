@@ -10,6 +10,14 @@ services:
       - "3000:3000"
       - "3100:3100"
 
+  client:
+    build:
+      context: ./app
+    depends_on:
+      - app
+    ports:
+      - "3000:3001"
+
   mongo:
     restart: always
     image: mongo:4.2.0
