@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
-import WebSocket, { WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
 import WorldManager, { myEmitter } from "./worldManager";
+import bodyParser from 'body-parser'
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json())
 
 const world = new WorldManager();
 world.start();
@@ -32,7 +34,8 @@ app.get("/miners/:id", function (req, res) {
 
 // POST /miners: create a miner
 app.post("/miners", function (req, res) {
-  world.createMiner();
+  console.log(req.body)
+  // world.createMiner(req.body);
   res.send({ miners: world.createMiner });
 });
 
@@ -62,11 +65,15 @@ wss.on("connection", function connection(ws) {
   });
 
   myEmitter.on("minerUpdate", (miner) => {
-    ws.send(JSON.stringify({message: 'minerUpdate', miner}))
+    ws.send(JSON.stringify({ message: "minerUpdate", miner }));
   });
 
   myEmitter.on("asteroidUpdate", (asteroid) => {
-    ws.send(JSON.stringify({message: 'asteroidUpdate', asteroid}))
+    ws.send(JSON.stringify({ message: "asteroidUpdate", asteroid }));
+  });
+
+  myEmitter.on("planetUpdate", (planet) => {
+    ws.send(JSON.stringify({ message: "planetUpdate", planet }));
   });
 });
 

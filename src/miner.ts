@@ -116,7 +116,6 @@ export default class Miner {
     this.x = nextX;
     this.y = nextY;
 
-
     if (this.x === this.originX && this.y === this.originY) {
       myEmitter.emit("transferDone", {
         planetId: this.planetId,
@@ -139,16 +138,16 @@ export default class Miner {
       amound = capacityRemaining;
     }
 
+    this.log(
+      `Mining asteroid ${this.targetAsteroidId} for ${this.miningYear} years`
+    );
+
     myEmitter.emit("mineAsteroid", {
       amound,
       minerId: this.id,
     });
 
     myEmitter.emit("minerUpdate", this);
-
-    this.log(
-      `Mining asteroid ${this.targetAsteroidId} for ${this.miningYear} years`
-    );
   }
 
   private bindEvent() {
@@ -198,12 +197,12 @@ export default class Miner {
         myEmitter.emit("leaveAsteroid", {
           asteroidId: this.targetAsteroidId,
         });
-        
-        const targetAsteroidId = this.targetAsteroidId
+
+        const targetAsteroidId = this.targetAsteroidId;
         this.status = MinerStatus.Transfering;
-        this.targetAsteroidId = undefined
-        this.targetX = undefined
-        this.targetY = undefined
+        this.targetAsteroidId = undefined;
+        this.targetX = undefined;
+        this.targetY = undefined;
 
         this.log(
           `Traveling back from asteroid ${targetAsteroidId} to ${this.planetName}`

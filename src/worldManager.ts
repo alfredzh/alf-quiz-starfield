@@ -68,8 +68,33 @@ export default class WorldManager {
     return this.asteroids;
   }
 
-  public createMiner() {
-    //
+  public createMiner(
+    planetId: string,
+    minerId: string,
+    carryCapacity: number,
+    travelSpeed: number,
+    miningSpeed: number
+  ) {
+    const planet = this.planets.find((item) => item.id === planetId);
+
+    if (!planet) {
+      throw new Error('Planet not exist')
+    }
+    const existMiner = planet
+      .getAllMiners()
+      .find((item) => item.id === minerId);
+    if (existMiner) {
+      throw new Error('Miner name exist')
+    }
+
+    planet.spawnMiner(
+      planet.x,
+      planet.y,
+      minerId,
+      carryCapacity,
+      travelSpeed,
+      miningSpeed
+    );
   }
 
   public getMinerById(id: string) {

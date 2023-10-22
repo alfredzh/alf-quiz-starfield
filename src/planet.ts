@@ -4,8 +4,8 @@ import { myEmitter } from "./worldManager";
 export default class Planet {
   public readonly id: string;
   private readonly name: string;
-  private readonly x: number;
-  private readonly y: number;
+  public readonly x: number;
+  public readonly y: number;
   private minerals = 0;
   private miners: Miner[] = [];
 
@@ -50,14 +50,7 @@ export default class Planet {
       }
       this.minerals += minerals;
 
-      if (this.id === "1") {
-        console.log(
-          this.name,
-          this.minerals,
-          this.miners.length,
-          "planet transfer done"
-        );
-      }
+      myEmitter.emit("planetUpdate", this);
     });
   }
 }
