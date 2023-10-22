@@ -89,6 +89,8 @@ export default class Miner {
     this.x = nextX;
     this.y = nextY;
 
+    myEmitter.emit("minerUpdate", this);
+
     if (this.x === this.targetX && this.y === this.targetY) {
       this.status = MinerStatus.Mining;
     }
@@ -114,24 +116,19 @@ export default class Miner {
     this.x = nextX;
     this.y = nextY;
 
-    if (this.x === this.originX && this.y === this.originY) {
-      if (this.id === "Alpha") {
-        console.log(this.x, this.y, this.mineAmount, "transfer done");
-      }
 
+    if (this.x === this.originX && this.y === this.originY) {
       myEmitter.emit("transferDone", {
         planetId: this.planetId,
         minerals: this.mineAmount,
       });
       this.mineAmount = 0;
       this.status = MinerStatus.Idle;
-
+    } else {
       this.log(`Transfering minerals to planet ${this.planetId}`);
     }
 
-    this.log(
-      `Traveling back from asteroid ${this.targetAsteroidId} to ${this.planetName}`
-    );
+    myEmitter.emit("minerUpdate", this);
   }
 
   private mine() {
@@ -146,6 +143,8 @@ export default class Miner {
       amound,
       minerId: this.id,
     });
+
+    myEmitter.emit("minerUpdate", this);
 
     this.log(
       `Mining asteroid ${this.targetAsteroidId} for ${this.miningYear} years`
@@ -195,12 +194,23 @@ export default class Miner {
       }
 
       this.mineAmount += amount;
-      if (this.mineAmount === this.carryCapacity) {
+      if (this.mineAmount === this.carryCapacity || isDepleted) {
+        myEmitter.emit("leaveAsteroid", {
+          asteroidId: this.targetAsteroidId,
+        });
+        
+        const targetAsteroidId = this.targetAsteroidId
         this.status = MinerStatus.Transfering;
+        this.targetAsteroidId = undefined
+        this.targetX = undefined
+        this.targetY = undefined
+
+        this.log(
+          `Traveling back from asteroid ${targetAsteroidId} to ${this.planetName}`
+        );
       }
-      if (isDepleted) {
-        this.status = MinerStatus.Transfering;
-      }
+
+      myEmitter.emit("minerUpdate", this);
     });
   }
 

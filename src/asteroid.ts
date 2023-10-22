@@ -14,9 +14,10 @@ export enum AsteroidStatus {
 
 export default class Asteroid {
   private id: string;
-  public x: number;
-  public y: number;
-  public mineralAmount: number;
+  private x: number;
+  private y: number;
+  private mineralAmount: number;
+  public readonly totalMineralAmount: number;
   public status = AsteroidStatus.HasMinerals;
   private minerId?: string;
 
@@ -25,6 +26,7 @@ export default class Asteroid {
     this.y = y;
     this.id = id;
     this.mineralAmount = mineralAmount;
+    this.totalMineralAmount = mineralAmount;
     this.bindEvent();
   }
 
@@ -43,6 +45,7 @@ export default class Asteroid {
       x: this.x,
       y: this.y,
     });
+    myEmitter.emit("asteroidUpdate", this);
   }
 
   public get hasMiner() {
@@ -62,11 +65,24 @@ export default class Asteroid {
         successAmount = this.mineralAmount;
         this.mineralAmount = 0;
         this.status = AsteroidStatus.Depleted;
-        isDepleted = true
+        isDepleted = true;
       }
 
-      
-      myEmitter.emit("mineAsteroidSuccess", { minerId, amount: successAmount, isDepleted });
+      myEmitter.emit("mineAsteroidSuccess", {
+        minerId,
+        amount: successAmount,
+        isDepleted,
+      });
+
+      myEmitter.emit("asteroidUpdate", this);
+    });
+
+    myEmitter.on("leaveAsteroid", ({ asteroidId }) => {
+      if (this.id !== asteroidId) {
+        return;
+      }
+      this.minerId = undefined
+      myEmitter.emit("asteroidUpdate", this);
     });
   }
 }

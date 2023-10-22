@@ -1,9 +1,8 @@
 import Asteroid, { AsteroidStatus } from "./asteroid";
 import { INIT_ASTEROIDS, INIT_MINERS, INIT_PLANETS } from "./initData";
+import Miner from "./miner";
 import Planet from "./planet";
 import EventEmitter from "events";
-
-
 
 export const myEmitter = new EventEmitter();
 
@@ -58,13 +57,27 @@ export default class WorldManager {
   }
 
   public getMiners() {
-    for (const iterator of this.planets) {
-    }
     return this.planets.map((item) => item.getAllMiners());
+  }
+
+  public getAllPlanets() {
+    return this.planets;
+  }
+
+  public getAllAsteroids() {
+    return this.asteroids;
   }
 
   public createMiner() {
     //
+  }
+
+  public getMinerById(id: string) {
+    let curr: Miner | undefined;
+    this.planets.forEach((item) => {
+      curr = item.getAllMiners().find((miner) => miner.id === id);
+    });
+    return curr;
   }
 
   public getMinersByPlanetId(planetId: string) {}
@@ -76,27 +89,7 @@ export default class WorldManager {
       );
       curr?.bindMiner(minerId);
     });
-
-    // myEmitter.on("logMinerSpawn", ({ planetId }) => {
-    //   this.logToDB(`Miner spawn on planet ${planetId}`);
-    // });
-
-    // myEmitter.on("logMinerTraveling", ({ planetId, asteroidId }) => {
-    //   this.logToDB(
-    //     `Traveling from planet ${planetId} to asteroid ${asteroidId}`
-    //   );
-    // });
-
-    // myEmitter.on("logMinerTraveling", ({  asteroidId }) => {
-    //   this.logToDB(
-    //     `Mining asteroid ${asteroidId} for ${this} years`
-    //   );
-    // });
   }
-
-  // private logToDB(msg: string) {
-  //   console.log(msg);
-  // }
 
   public start() {
     this.bindEvent();
@@ -105,21 +98,6 @@ export default class WorldManager {
       this.year += 1;
 
       myEmitter.emit("minerRun");
-
-      //       for (const planet of this.planets) {
-      //         for (const miner of planet.getAllMiners()) {
-      //           switch(miner.status) {
-      //             case MinerStatus.Idle:
-      // // this.asteroids.find(item => item.status)
-      //           }
-      //         }
-      //       }
-      // this.planets.map(item => {
-      //   item.getAllMiners().map(miner => {
-      //     if (miner.status === )
-      //   })
-      // })
-      //   console.log("started, year:", this.year);
     }, 1000);
   }
 }
